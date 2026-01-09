@@ -1,0 +1,48 @@
+version: '3.9'
+
+services:
+  app:
+    image: backend-engineering-case-study
+    container_name: backend-engineering-case-study
+    restart: on-failure
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    networks:
+      - local-network
+    depends_on:
+      - mysqldb
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://case-mysqldb:3306/mysql-db
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: password
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 40s
+
+  mysqldb:
+    image: mysql:8.0.34
+    container_name: case-mysqldb
+    restart: always
+    environment:
+      MYSQL_DATABASE: mysql-db
+      MYSQL_ROOT_PASSWORD: password
+    ports:
+      - "3306:3306"
+    networks:
+      - local-network
+    volumes:
+      - case-mysql-data:/var/lib/mysql
+      - ./mysql-db-dump.sql:/docker-entrypoint-initdb.d/mysql-db-dump.sql:ro
+
+volumes:
+  case-mysql-data:
+
+networks:
+  local-network:
+    driver: bridge
