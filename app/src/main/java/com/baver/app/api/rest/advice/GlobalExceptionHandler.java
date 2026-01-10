@@ -6,11 +6,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.net.URI;
 import java.time.Instant;
+import java.util.HashMap;
+import java.util.Map;
 
 @RestControllerAdvice
 @Slf4j
@@ -26,6 +30,25 @@ public class GlobalExceptionHandler {
                 "USER_ALREADY_EXISTS",
                 ex.getMessage()
         );
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ProblemDetail handleValidationException(MethodArgumentNotValidException ex) {
+        log.warn("VALIDATION_ERROR count={}", ex.getBindingResult().getErrorCount());
+
+        Map<String, String> validationErrors = new HashMap<>();
+        for (FieldError error : ex.getBindingResult().getFieldErrors()) {
+            validationErrors.put(error.getField(), error.getDefaultMessage());
+        }
+
+        ProblemDetail pd = buildCustomProblemDetail(
+                HttpStatus.BAD_REQUEST,
+                "VALIDATION_FAILED",
+                "Input validation failed"
+        );
+
+        pd.setProperty("errors", validationErrors);
+        return pd;
     }
 
     @ExceptionHandler(Exception.class)
