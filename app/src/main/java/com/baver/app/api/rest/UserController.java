@@ -1,7 +1,7 @@
 package com.baver.app.api.rest;
 
 import com.baver.app.api.rest.dto.CreateUserRequest;
-import com.baver.app.api.rest.dto.CreateUserResponse;
+import com.baver.app.api.rest.dto.UserResponse;
 import com.baver.app.application.user.CreateUserUseCase;
 import com.baver.app.common.constants.ApiVersion;
 import io.swagger.v3.oas.annotations.Operation;
@@ -23,9 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "User Management", description = "Operations related to user lifecycle")
 public class UserController {
 
-    private static final String HEADER_API_VERSION = "X-Api-Version";
-    private static final String V1_HEADER_MATCH = HEADER_API_VERSION + "=1";
-    
     private final CreateUserUseCase createUserUseCase;
 
     /**
@@ -35,12 +32,12 @@ public class UserController {
      */
     @Operation(summary = "Create a new user (V1)", description = "Requires unique username and header X-Api-Version=1")
     @PostMapping(headers = ApiVersion.Constants.V1_MATCH)
-    public ResponseEntity<CreateUserResponse> createUserV1(
+    public ResponseEntity<UserResponse> createUserV1(
             @Valid @RequestBody CreateUserRequest request
     ) {
         log.info("REQUEST_RECEIVED endpoint=CreateUser version=1 username={}", request.username());
 
-        CreateUserResponse response = createUserUseCase.createUser(request);
+        UserResponse response = createUserUseCase.createUser(request);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(response);

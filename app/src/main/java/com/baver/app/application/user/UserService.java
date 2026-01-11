@@ -1,7 +1,7 @@
 package com.baver.app.application.user;
 
 import com.baver.app.api.rest.dto.CreateUserRequest;
-import com.baver.app.api.rest.dto.CreateUserResponse;
+import com.baver.app.api.rest.dto.UserResponse;
 import com.baver.app.domain.user.CountryCode;
 import com.baver.app.domain.user.User;
 import com.baver.app.domain.user.UserExistsException;
@@ -28,7 +28,7 @@ public class UserService implements CreateUserUseCase {
 
     @Override
     @Transactional
-    public CreateUserResponse createUser(CreateUserRequest request) {
+    public UserResponse createUser(CreateUserRequest request) {
         String username = request.username();
         log.info("CREATE_USER_STARTED username={}", request.username());
 

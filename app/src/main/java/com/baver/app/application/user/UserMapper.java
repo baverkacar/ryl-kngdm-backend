@@ -1,6 +1,6 @@
 package com.baver.app.application.user;
 
-import com.baver.app.api.rest.dto.CreateUserResponse;
+import com.baver.app.api.rest.dto.UserResponse;
 import com.baver.app.domain.user.User;
 import com.baver.app.infrastructure.persistence.jpa.entity.UserEntity;
 import org.springframework.stereotype.Component;
@@ -21,11 +21,12 @@ public class UserMapper {
         return e;
     }
 
-    public CreateUserResponse toCreateUserResponse(User user) {
+    public UserResponse toCreateUserResponse(User user) {
         if (user == null) return null;
 
-        return new CreateUserResponse(
+        return new UserResponse(
                 user.getPublicId(),
+                user.getUsername(),
                 user.getLevel(),
                 user.getCoins(),
                 user.getCountryCode().name()
