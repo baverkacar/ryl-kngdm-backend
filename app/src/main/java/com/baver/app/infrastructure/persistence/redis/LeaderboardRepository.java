@@ -1,8 +1,8 @@
 package com.baver.app.infrastructure.persistence.redis;
 
 import com.baver.app.common.constants.LeaderboardKey;
-import com.baver.app.domain.leaderboard.GlobalLeaderboardRepository;
 import com.baver.app.domain.leaderboard.LeaderboardEntry;
+import com.baver.app.domain.user.CountryCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.ZSetOperations;
@@ -15,15 +15,25 @@ import java.util.Set;
 
 @Repository
 @RequiredArgsConstructor
-public class GlobalLeaderboardRedisRepository implements GlobalLeaderboardRepository {
+public class LeaderboardRepository implements com.baver.app.domain.leaderboard.LeaderboardRepository {
 
-    private static final String LEADERBOARD_KEY = "leaderboard:global";
     private final StringRedisTemplate redisTemplate;
 
     @Override
     public List<LeaderboardEntry> getTopPlayers(int limit) {
         String key = LeaderboardKey.GLOBAL.getKey();
 
+        return getLeaderboardEntries(limit, key);
+    }
+
+    @Override
+    public List<LeaderboardEntry> getTopPlayersByCountry(CountryCode countryCode, int limit) {
+        String key = LeaderboardKey.COUNTRY.getKey(countryCode.name());
+
+        return getLeaderboardEntries(limit, key);
+    }
+
+    private List<LeaderboardEntry> getLeaderboardEntries(int limit, String key) {
         Set<ZSetOperations.TypedTuple<String>> range = redisTemplate.opsForZSet()
                 .reverseRangeWithScores(key, 0, limit - 1);
 
@@ -54,7 +64,6 @@ public class GlobalLeaderboardRedisRepository implements GlobalLeaderboardReposi
         return new LeaderboardEntry(
                 parts[0],
                 parts[1],
-                parts[2],
                 score.intValue()
         );
     }

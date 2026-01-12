@@ -19,8 +19,6 @@ import java.time.Instant;
 @Slf4j
 public class UserService implements CreateUserUseCase {
 
-    private static final int MAX_PUBLIC_ID_ATTEMPTS = 25;
-
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PublicIdGenerator publicIdGenerator;
@@ -57,7 +55,9 @@ public class UserService implements CreateUserUseCase {
     }
 
     private String generateUniquePublicId() {
-        for (int i = 0; i < MAX_PUBLIC_ID_ATTEMPTS; i++) {
+        int maxAttempts = 25;
+
+        for (int i = 0; i < maxAttempts; i++) {
             String candidate = publicIdGenerator.generate();
             if (!userRepository.existsByPublicId(candidate)) {
                 return candidate;
