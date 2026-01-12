@@ -5,8 +5,8 @@ import lombok.Getter;
 @Getter
 public enum LeaderboardKey {
 
-    GLOBAL("leaderboard:global");
-
+    GLOBAL("leaderboard:global"),
+    COUNTRY("leaderboard:country:%s");
 
     private final String keyTemplate;
 
